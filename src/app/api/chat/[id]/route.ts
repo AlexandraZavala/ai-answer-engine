@@ -15,17 +15,17 @@ type Message = {
     content: string;
 }
 
-export async function GET(request: Request, {params}: {params: {id: string}}){
+export async function GET(request: Request, context: {params: {id: string}}){
     try{
-        const conversation = await redis.get(`conversation:${params.id}`);
+        const conversation = await redis.get(`conversation:${context.params.id}`);
         if(!conversation){
-            logger.info(`Conversation for ${params.id} not found`);
-            return null;
+            logger.info(`Conversation for ${context.params.id} not found`);
+            return NextResponse.json({error: "Conversation not found"}, {status: 404});
         }
 
         return NextResponse.json(conversation as Message[]);
     } catch (error) {
-        logger.error(`Error getting conversation for ${params.id}: ${error}`);
-        return null;
+        logger.error(`Error getting conversation for ${context.params.id}: ${error}`);
+        return NextResponse.json({error: "Error getting conversation"}, {status: 500});
     }
 }
