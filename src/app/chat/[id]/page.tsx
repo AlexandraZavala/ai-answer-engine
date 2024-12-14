@@ -2,9 +2,8 @@
 
 //todo: add a button to share the chat
 
-import { useState } from "react";
-
-const URL = "http://localhost:3000"
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 type Message = {
   role: "user" | "assistant";
@@ -18,6 +17,7 @@ const generateTimeBasedId = (): string => {
 };
 
 export default function Home() {
+  const {id } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hello! How can I help you today?" },
@@ -26,6 +26,24 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sharedId, setSharedId] = useState("");
 
+  console.log(id)
+
+  useEffect(() => {
+    const fetchConversation = async () => {
+      try {
+        const response = await fetch(`/api/chat/${id}`);
+        const data = await response.json();
+        console.log(data)
+        setMessages(data);
+      } catch (error) {
+        console.error("Error fetching conversation:", error);
+      }
+    };
+    console.log(id)
+    if (id) {
+      fetchConversation();
+    }
+  }, [id]);
 
   const handleSend = async () => {
     if (!message.trim()) return;
@@ -177,34 +195,33 @@ export default function Home() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-gray-800 p-4 rounded-lg ">
             <div className="flex items-center gap-2 justify-between">
-            <h3 className="text-xl font-semibold text-white">
-              Conversation Shared!
-            </h3>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="text-gray-400 hover:text-white"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <h3 className="text-xl font-semibold text-white">
+                Conversation Shared!
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-white"
               >
-                <path d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
               </button>
             </div>
             <div className="flex items-center gap-2 p-6 rounded-lg">
-              <p>Share this link:</p>
+              <p>Shared ID: </p>
               <div className="flex items-center gap-2 bg-gray-700 p-2 rounded-lg">
-                <code className="text-gray-400"> {URL}/chat/{sharedId}</code>
+                <code className="text-gray-400"> {sharedId}</code>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(URL + "/chat/" + sharedId);
-                    
+                    navigator.clipboard.writeText(sharedId);
                   }}
                   className="p-2 hover:bg-gray-600 rounded"
                   title="Copy to clipboard"

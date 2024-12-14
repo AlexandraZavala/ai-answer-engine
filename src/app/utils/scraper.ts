@@ -4,10 +4,16 @@ import { Logger } from "./logger";
 import { Redis } from "@upstash/redis";
 import puppeteer from "puppeteer";
 
+
 const logger = new Logger("scraper");
 
 const MAX_CACHE_SIZE = 1000000;
 const CACHE_EXPIRATION_TIME = 7 * 60 * 60 * 24; // 1 day
+
+interface ChatMessage {
+  role: "system" | "user" | "assistant",
+  content: string
+}
 
 const redis = new Redis({
   url: process.env["UPSTASH_REDIS_REST_URL"],
@@ -303,32 +309,3 @@ async function cacheContent(
 }
 
 export { getCachedScrapedContent, cacheContent };
-
-//TODO : implement conversation history
-/*
-export async function saveConversation(id: string, messages: ChatMessage[]){
-    
-    try{
-        logger.info(`Getting conversation for ${id}`);
-        await redis.set(`conversation:${id}`, JSON.stringify(messages), {ex: 7* 60 * 60 * 24});
-        logger.info(`Conversation for ${id} saved`);
-    } catch (error) {
-        logger.error(`Error saving conversation for ${id}: ${error}`);
-    }
-}
-
-export async function getConversation(id: string): Promise<ChatMessage[]|null>{
-    try{
-        const conversation = await redis.get(`conversation:${id}`);
-        if(!conversation){
-            logger.info(`Conversation for ${id} not found`);
-            return null;
-        }
-
-        return conversation as ChatMessage[];
-    } catch (error) {
-        logger.error(`Error getting conversation for ${id}: ${error}`);
-        return null;
-    }
-}
-*/

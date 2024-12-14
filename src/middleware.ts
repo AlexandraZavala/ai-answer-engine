@@ -18,7 +18,7 @@ const redis = new Redis({
 //To Prevent Abuse of the API
 const ratelimit = new Ratelimit({
   redis: redis, //redis client
-  limiter: Ratelimit.slidingWindow(5, "60 s"), //sliding window, 10 requests per 60 seconds
+  limiter: Ratelimit.slidingWindow(10, "60 s"), //sliding window, 10 requests per 60 seconds
   analytics: true, //enable analytics
 });
 
@@ -40,9 +40,7 @@ export async function middleware(request: NextRequest) {
 
     return response;
 
-    //usser session
-    //use server action, call in on the client
-    //return response;
+    
   } catch (error) {
     console.error("Error in middleware", error);
     return NextResponse.json({error: 'Internal server error'}, {status: 500});
