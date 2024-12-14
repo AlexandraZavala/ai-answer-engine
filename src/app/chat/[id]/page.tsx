@@ -31,7 +31,13 @@ export default function Home() {
   useEffect(() => {
     const fetchConversation = async () => {
       try {
-        const response = await fetch(`/api/chat/${id}`);
+        const response = await fetch(`/api/conversation/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({id}),
+        });
         const data = await response.json();
         console.log(data);
         setMessages(data);
