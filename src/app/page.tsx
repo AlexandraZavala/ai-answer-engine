@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 
-const URL = "http://localhost:3000"
+
 
 type Message = {
   role: "user" | "assistant";
@@ -200,7 +200,7 @@ export default function Home() {
             <div className="flex items-center gap-2 p-6 rounded-lg">
               <p>Share this link:</p>
               <div className="flex items-center gap-2 bg-gray-700 p-2 rounded-lg">
-                <code className="text-gray-400"> {URL}/chat/{sharedId}</code>
+                <code className="text-gray-400"> {process.env.URL}/chat/{sharedId}</code>
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(URL + "/chat/" + sharedId);

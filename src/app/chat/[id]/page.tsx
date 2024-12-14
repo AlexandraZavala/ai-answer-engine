@@ -17,7 +17,7 @@ const generateTimeBasedId = (): string => {
 };
 
 export default function Home() {
-  const {id } = useParams();
+  const { id } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "Hello! How can I help you today?" },
@@ -26,20 +26,20 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sharedId, setSharedId] = useState("");
 
-  console.log(id)
+  console.log(id);
 
   useEffect(() => {
     const fetchConversation = async () => {
       try {
         const response = await fetch(`/api/chat/${id}`);
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         setMessages(data);
       } catch (error) {
         console.error("Error fetching conversation:", error);
       }
     };
-    console.log(id)
+    console.log(id);
     if (id) {
       fetchConversation();
     }
@@ -218,10 +218,13 @@ export default function Home() {
             <div className="flex items-center gap-2 p-6 rounded-lg">
               <p>Shared ID: </p>
               <div className="flex items-center gap-2 bg-gray-700 p-2 rounded-lg">
-                <code className="text-gray-400"> {sharedId}</code>
+                <code className="text-gray-400">
+                  {" "}
+                  {process.env.URL}/chat/{sharedId}
+                </code>
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(sharedId);
+                    navigator.clipboard.writeText(URL + "/chat/" + sharedId);
                   }}
                   className="p-2 hover:bg-gray-600 rounded"
                   title="Copy to clipboard"
