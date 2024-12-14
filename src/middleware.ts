@@ -15,6 +15,7 @@ const redis = new Redis({
   token: process.env["UPSTASH_REDIS_REST_TOKEN"],
 });
 
+
 //To Prevent Abuse of the API
 const ratelimit = new Ratelimit({
   redis: redis, //redis client
