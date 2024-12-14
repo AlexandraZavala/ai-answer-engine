@@ -1,16 +1,18 @@
 "use client";
 
+//todo: add a button to share the chat
+
 import { useState } from "react";
 
 type Message = {
-  role: "user" | "ai";
+  role: "user" | "assistant";
   content: string;
 };
 
 export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
-    { role: "ai", content: "Hello! How can I help you today?" },
+    { role: "assistant", content: "Hello! How can I help you today?" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,18 +26,32 @@ export default function Home() {
     setIsLoading(true);
 
     try {
+      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, messages }),
+        //?create a server action in next js, then send the request
       });
 
-      // TODO: Handle the response from the chat API to display the AI response in the UI
 
+      const data = await response.json()
+      //console.log('data',data)
+      if(data.error){
+        const aiMessage = { role: "assistant" as const, content: data.error };
+        setMessages(prev => [...prev, aiMessage])
+        return;
+      }
 
+      //console.log('message',message)
+      //console.log('data',data)
+      const aiMessage = { role: "assistant" as const, content: data };
 
+      setMessages(prev => [...prev, aiMessage])
+
+      //TODO: use server action to send the request
 
     } catch (error) {
       console.error("Error:", error);
@@ -63,14 +79,14 @@ export default function Home() {
             <div
               key={index}
               className={`flex gap-4 mb-4 ${
-                msg.role === "ai"
+                msg.role === "assistant"
                   ? "justify-start"
                   : "justify-end flex-row-reverse"
               }`}
             >
               <div
                 className={`px-4 py-2 rounded-2xl max-w-[80%] ${
-                  msg.role === "ai"
+                  msg.role === "assistant"
                     ? "bg-gray-800 border border-gray-700 text-gray-100"
                     : "bg-cyan-600 text-white ml-auto"
                 }`}
