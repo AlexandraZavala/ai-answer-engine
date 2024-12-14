@@ -10,10 +10,6 @@ const logger = new Logger("scraper");
 const MAX_CACHE_SIZE = 1000000;
 const CACHE_EXPIRATION_TIME = 7 * 60 * 60 * 24; // 1 day
 
-interface ChatMessage {
-  role: "system" | "user" | "assistant",
-  content: string
-}
 
 const redis = new Redis({
   url: process.env["UPSTASH_REDIS_REST_URL"],
@@ -220,7 +216,7 @@ function getCacheKey(url: string): string {
   return `scraped:${sanitizedUrl}`;
 }
 
-function isValidScrappedContent(data: any): data is ScrapedContent {
+function isValidScrappedContent(data: ScrapedContent): data is ScrapedContent {
   return (
     typeof data === "object" &&
     data !== null &&
@@ -250,7 +246,7 @@ async function getCachedScrapedContent(
 
     logger.info(`Cache hit for ${url}`);
 
-    let parsed: any;
+    let parsed: unknown;
 
     if (typeof cached === "string") {
       try {
@@ -264,12 +260,12 @@ async function getCachedScrapedContent(
       parsed = cached;
     }
 
-    if (isValidScrappedContent(parsed)) {
-      const age = Date.now() - (parsed.createdAt || 0);
+    if (isValidScrappedContent(parsed as ScrapedContent)) {
+      const age = Date.now() - (parsed as ScrapedContent).createdAt;
       logger.info(
         `Cache hit for ${url} with age ${Math.round(age / 1000 / 60)} minutes`
       );
-      return parsed;
+      return parsed as ScrapedContent;
     }
 
     logger.warn(`Invalid cached data for ${url}`);
